@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html lang="fa">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>مینی‌اپ NFT تلگرام</title>
-  <style>
-    body { font-family: sans-serif; direction: rtl; text-align: center; padding: 20px; background: #f0f8ff; }
-    #userInfo { margin-bottom: 10px; }
-    .nft-card { display: inline-block; margin: 10px; border: 2px solid #333; border-radius: 10px; padding: 10px; width: 150px; }
-    .nft-card img { width: 100%; border-radius: 10px; }
-    button { margin-top: 5px; padding: 8px 12px; border-radius: 6px; border: none; background-color: #00796b; color: #fff; cursor: pointer; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مینی‌اپ NFT تلگرام</title>
+<style>
+  body { font-family: sans-serif; direction: rtl; text-align: center; padding: 20px; background: #f0f8ff; }
+  #userInfo { margin-bottom: 10px; }
+  .nft-card { display: inline-block; margin: 10px; border: 2px solid #333; border-radius: 10px; padding: 10px; width: 150px; }
+  .nft-card img { width: 100%; border-radius: 10px; }
+  button { margin-top: 5px; padding: 8px 12px; border-radius: 6px; border: none; background-color: #00796b; color: #fff; cursor: pointer; }
+</style>
 </head>
 <body>
 
@@ -20,7 +20,9 @@
 
 <button id="connectBtn">اتصال کیف پول TON</button>
 
-<script src="https://unpkg.com/tonconnect/dist/tonconnect.min.js"></script>
+<!-- TonConnectUI -->
+<script src="https://unpkg.com/tonconnect-ui/dist/tonconnect-ui.min.js"></script>
+
 <script>
 const tg = window.Telegram?.WebApp;
 const userInfo = document.getElementById('userInfo');
@@ -48,13 +50,15 @@ nftData.forEach(nft => {
   nftContainer.appendChild(card);
 });
 
-// اتصال کیف پول TON
+// TonConnectUI
 let wallet;
-const tonConnect = new TonConnect.TonConnect();
-document.getElementById('connectBtn').addEventListener('click', async () => {
-  await tonConnect.connect();
-  wallet = tonConnect.wallet;
-  alert(`کیف پول متصل شد: ${wallet?.name || wallet?.address}`);
+const tonConnectUI = new TonConnectUI.TonConnectUI({
+  connectButton: document.getElementById('connectBtn')
+});
+
+tonConnectUI.on('connect', (w) => {
+  wallet = w;
+  alert(`کیف پول متصل شد: ${wallet.name || wallet.address}`);
 });
 
 // خرید NFT
@@ -63,18 +67,17 @@ async function buyNFT(nftId, nftPrice){
     alert("ابتدا کیف پول خود را وصل کنید.");
     return;
   }
-  const buyAmount = nftPrice + 1.0; // قیمت NFT + 1 TON اضافی
   const transaction = {
     validUntil: Math.floor(Date.now() / 1000) + 360,
     messages: [
       {
-        address: "0:your_contract_address_here", // آدرس قرارداد فروش NFT
-        amount: buyAmount * 1e9 // تبدیل به نانو
+        address: "0:your_contract_address_here", // جایگزین با آدرس قرارداد NFT
+        amount: nftPrice * 1e9 // تبدیل TON به نانو
       }
     ]
   };
   try {
-    await tonConnect.sendTransaction(transaction);
+    await tonConnectUI.connectWallet.sendTransaction(transaction);
     alert(`NFT ${nftId} با موفقیت خریداری شد!`);
   } catch (error) {
     alert("خطا در انجام تراکنش: " + error.message);
