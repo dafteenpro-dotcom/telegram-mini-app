@@ -3,35 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>بازی مینی‌اپ تلگرام 🎯</title>
+<title>Catch the Balls - مینی‌اپ تلگرام 🎯</title>
 <style>
   body {
     font-family: sans-serif;
     direction: rtl;
     text-align: center;
-    padding: 20px;
     background: #e0f7fa;
+    padding: 20px;
   }
   #userInfo { margin-bottom: 10px; font-size: 16px; }
   #score, #timer { font-size: 20px; margin: 5px; }
   #gameArea {
-    position: relative;
+    background: #fff;
+    border: 2px solid #333;
+    border-radius: 12px;
+    margin: 10px auto;
     width: 320px;
     height: 480px;
-    margin: 10px auto;
-    border: 2px solid #333;
-    background: #ffffff;
-    overflow: hidden;
-    border-radius: 12px;
-  }
-  .ball {
-    position: absolute;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: #f44336;
-    cursor: pointer;
-    transition: all 0.2s ease;
+    position: relative;
   }
   button {
     margin-top: 10px;
@@ -46,15 +36,5 @@
 </head>
 <body>
 
-<h2>🎯 بازی تلگرام - Catch the Ball</h2>
-<p id="userInfo">در حال دریافت اطلاعات کاربر...</p>
-<p id="score">امتیاز: 0</p>
-<p id="timer">زمان باقی‌مانده: 30 ثانیه</p>
+<h2>🎯
 
-<div id="gameArea">
-  <div class="ball" id="ball"></div>
-</div>
-
-<button id="startBtn">شروع بازی</button>
-
-<audio id="hitSound" src="https://actions.google.com/sounds/v1/c
