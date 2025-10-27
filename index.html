@@ -1,40 +1,86 @@
 <!DOCTYPE html>
 <html lang="fa">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Catch the Balls - مینی‌اپ تلگرام 🎯</title>
-<style>
-  body {
-    font-family: sans-serif;
-    direction: rtl;
-    text-align: center;
-    background: #e0f7fa;
-    padding: 20px;
-  }
-  #userInfo { margin-bottom: 10px; font-size: 16px; }
-  #score, #timer { font-size: 20px; margin: 5px; }
-  #gameArea {
-    background: #fff;
-    border: 2px solid #333;
-    border-radius: 12px;
-    margin: 10px auto;
-    width: 320px;
-    height: 480px;
-    position: relative;
-  }
-  button {
-    margin-top: 10px;
-    padding: 10px 16px;
-    font-size: 16px;
-    border-radius: 8px;
-    border: none;
-    background-color: #00796b;
-    color: #fff;
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مینی‌اپ NFT تلگرام</title>
+  <style>
+    body { font-family: sans-serif; direction: rtl; text-align: center; padding: 20px; background: #f0f8ff; }
+    #userInfo { margin-bottom: 10px; }
+    .nft-card { display: inline-block; margin: 10px; border: 2px solid #333; border-radius: 10px; padding: 10px; width: 150px; }
+    .nft-card img { width: 100%; border-radius: 10px; }
+    button { margin-top: 5px; padding: 8px 12px; border-radius: 6px; border: none; background-color: #00796b; color: #fff; cursor: pointer; }
+  </style>
 </head>
 <body>
 
-<h2>🎯
+<h2>🎨 فروش NFT در تلگرام</h2>
+<p id="userInfo">در حال دریافت اطلاعات کاربر...</p>
+<div id="nftContainer"></div>
 
+<button id="connectBtn">اتصال کیف پول TON</button>
+
+<script src="https://unpkg.com/tonconnect/dist/tonconnect.min.js"></script>
+<script>
+const tg = window.Telegram?.WebApp;
+const userInfo = document.getElementById('userInfo');
+if(tg){
+  const user = tg.initDataUnsafe?.user || tg.initData?.user;
+  userInfo.innerText = user
+    ? `کاربر: ${user.first_name || ''} ${user.last_name || ''} – @${user.username || ''}`
+    : 'اطلاعات کاربر موجود نیست.';
+}else{
+  userInfo.innerText = 'این صفحه باید از داخل تلگرام باز شود.';
+}
+
+// نمونه NFTها
+const nftData = [
+  { id: 1, name: "NFT آبی", image: "https://via.placeholder.com/150/2196f3/ffffff?text=NFT+1", price: 5.0 },
+  { id: 2, name: "NFT سبز", image: "https://via.placeholder.com/150/4caf50/ffffff?text=NFT+2", price: 3.5 },
+  { id: 3, name: "NFT قرمز", image: "https://via.placeholder.com/150/f44336/ffffff?text=NFT+3", price: 7.0 }
+];
+
+const nftContainer = document.getElementById('nftContainer');
+nftData.forEach(nft => {
+  const card = document.createElement('div');
+  card.className = 'nft-card';
+  card.innerHTML = `<img src="${nft.image}" alt="${nft.name}"><p>${nft.name}</p><p>${nft.price} TON</p><button onclick="buyNFT(${nft.id}, ${nft.price})">خرید</button>`;
+  nftContainer.appendChild(card);
+});
+
+// اتصال کیف پول TON
+let wallet;
+const tonConnect = new TonConnect.TonConnect();
+document.getElementById('connectBtn').addEventListener('click', async () => {
+  await tonConnect.connect();
+  wallet = tonConnect.wallet;
+  alert(`کیف پول متصل شد: ${wallet?.name || wallet?.address}`);
+});
+
+// خرید NFT
+async function buyNFT(nftId, nftPrice){
+  if(!wallet){
+    alert("ابتدا کیف پول خود را وصل کنید.");
+    return;
+  }
+  const buyAmount = nftPrice + 1.0; // قیمت NFT + 1 TON اضافی
+  const transaction = {
+    validUntil: Math.floor(Date.now() / 1000) + 360,
+    messages: [
+      {
+        address: "0:your_contract_address_here", // آدرس قرارداد فروش NFT
+        amount: buyAmount * 1e9 // تبدیل به نانو
+      }
+    ]
+  };
+  try {
+    await tonConnect.sendTransaction(transaction);
+    alert(`NFT ${nftId} با موفقیت خریداری شد!`);
+  } catch (error) {
+    alert("خطا در انجام تراکنش: " + error.message);
+  }
+}
+</script>
+
+</body>
+</html>
